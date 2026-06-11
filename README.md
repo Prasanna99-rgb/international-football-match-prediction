@@ -14,9 +14,7 @@ The objective is to demonstrate an end-to-end Machine Learning workflow, includi
 
 ## 🚀 Live Demo
 
-### Try the Streamlit Application
-
-🔗 https://international-football-match-prediction-vracwacyrkznbs3uvycjxc.streamlit.app/
+👉 [Try the Streamlit App](https://international-football-match-prediction-vracwacyrkznbs3uvycjxc.streamlit.app/)
 
 ---
 
