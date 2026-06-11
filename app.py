@@ -5,12 +5,14 @@ import joblib
 # Load Model
 model = joblib.load("football_match_predictor.pkl")
 
+# Page Config
 st.set_page_config(
-    page_title="⚽ Football Match Predictor",
+    page_title="Football Match Outcome Prediction",
     page_icon="⚽",
     layout="wide"
 )
 
+# Title
 st.title("⚽ International Football Match Outcome Predictor")
 
 st.markdown("""
@@ -20,10 +22,12 @@ Predict whether the **Home Team** will win using:
 - FIFA Points
 - Elo Ratings
 - Home Advantage
+- Machine Learning (Random Forest)
 """)
 
 st.divider()
 
+# Inputs
 col1, col2 = st.columns(2)
 
 with col1:
@@ -31,7 +35,7 @@ with col1:
     st.subheader("🏠 Home Team")
 
     home_team = st.text_input(
-        "Home Team Name",
+        "Home Team",
         "Argentina"
     )
 
@@ -44,7 +48,7 @@ with col1:
 
     home_points = st.number_input(
         "Home FIFA Points",
-        value=1800.0
+        value=1886.0
     )
 
     home_elo = st.number_input(
@@ -57,7 +61,7 @@ with col2:
     st.subheader("✈️ Away Team")
 
     away_team = st.text_input(
-        "Away Team Name",
+        "Away Team",
         "Brazil"
     )
 
@@ -65,12 +69,12 @@ with col2:
         "Away FIFA Rank",
         min_value=1,
         max_value=250,
-        value=3
+        value=5
     )
 
     away_points = st.number_input(
         "Away FIFA Points",
-        value=1750.0
+        value=1770.0
     )
 
     away_elo = st.number_input(
@@ -80,18 +84,19 @@ with col2:
 
 st.divider()
 
-home_advantage = st.selectbox(
-    "Home Advantage",
-    [1, 0],
-    format_func=lambda x:
-    "Yes" if x == 1 else "Neutral Venue"
+home_advantage = st.radio(
+    "Match Venue",
+    ["Home Ground", "Neutral Venue"]
 )
 
+home_advantage = 1 if home_advantage == "Home Ground" else 0
+
+# Feature Engineering
 rank_difference = away_rank - home_rank
 
 elo_difference = home_elo - away_elo
 
-input_data = pd.DataFrame({
+input_df = pd.DataFrame({
 
     "home_rank":[home_rank],
 
@@ -113,38 +118,45 @@ input_data = pd.DataFrame({
 
 })
 
-if st.button("Predict Match"):
+# Prediction
+if st.button("Predict Match Outcome"):
 
-    prediction = model.predict(input_data)[0]
+    prediction = model.predict(input_df)[0]
 
-    probability = model.predict_proba(input_data)[0]
+    probability = model.predict_proba(input_df)[0]
 
     st.subheader("📊 Prediction Result")
 
     if prediction == 1:
 
         st.success(
-            f"🏆 {home_team} is predicted to WIN"
+            f"🏆 Predicted Winner: {home_team}"
         )
 
         st.metric(
-            "Winning Probability",
+            "Home Team Win Probability",
             f"{probability[1]*100:.2f}%"
         )
 
     else:
 
         st.error(
-            f"🏆 {away_team} is predicted to WIN / Avoid Defeat"
+            f"🏆 Predicted Winner: {away_team}"
         )
 
         st.metric(
-            "Winning Probability",
+            "Away Team Win Probability",
             f"{probability[0]*100:.2f}%"
         )
 
     st.divider()
 
-    st.subheader("Model Inputs")
+    st.subheader("Feature Values")
 
-    st.dataframe(input_data)
+    st.dataframe(input_df)
+
+# Footer
+st.markdown("---")
+st.markdown(
+    "Built by **Prasanna Deshmane** | Machine Learning | FIFA Rankings | Elo Ratings | Streamlit"
+)
